@@ -1,0 +1,80 @@
+#python3
+
+import os
+import re
+
+class Data:
+
+  def __init__ (self):
+      temp = 0
+      hum = 0
+      temp1avg = 0
+      hum1avg = 0
+      temp5avg = 0
+      hum5avg = 0
+      co2ppm = 0
+      co2V = 0
+  def __str__(self):
+      return str(Data.__class__) + ": " + str(Data.__dict__)
+#
+class Word:
+    temp = "Temperature: "
+    hum = "Humidity: "
+    temp1avg = "Average 1-min temperature: "
+    hum1avg = "Average 1-min Humidity: "
+    temp5avg = "Average 5-min temperature: "
+    hum5avg = "Average 5-min Humidity: "
+    co2ppm = "CO2 ppm: "
+    co2V = "CO2 Volts: "
+
+    def __str__ (self):
+      return str(Word.__class__) + ": " + str(Word.__dict__)
+    pass
+#
+def slice_text (Data,String):
+   #function for searching parameters
+   sliced_text = slice ( Data , Data + 45 )
+   result = String[sliced_text]
+   result = float("".join(regex_all.findall(String[sliced_text])))
+   Data = result
+   return Data
+#
+### Start program ###
+cmd = 'wget -O -  http://192.168.1.212' #get data(html-page) from esp web server 
+cmd2 = 'date "+%T;%d-%m-%y"'
+FullString = os.popen(cmd)
+date = os.popen(cmd2)
+FullString = FullString.read()
+date = date.read()
+#Parsing data
+Data.temp = FullString.find(Word.temp)
+Data.hum = FullString.find(Word.hum)
+Data.temp1avg = FullString.find(Word.temp1avg)
+Data.hum1avg = FullString.find(Word.hum1avg)
+Data.temp5avg = FullString.find(Word.temp5avg)
+Data.hum5avg = FullString.find(Word.hum5avg)
+Data.co2ppm = FullString.find(Word.co2ppm)
+Data.co2V = FullString.find(Word.co2V)
+if Data.temp == -1 or Data.hum == -1 or Data.co2ppm == -1 or Data.co2V == -1:
+    #print (Data())
+    print ("Not Found Data, server down ?")
+else:
+    i = 45
+    regex_all = re.compile("\s[0-9]{1,5}\.[0-9]{1,2}\s")
+    Data.temp = slice_text (Data.temp, str(FullString))
+    Data.hum =slice_text ( Data.hum  , str(FullString))
+    Data.temp1avg = slice_text ( Data.temp1avg  , str(FullString) )
+    Data.hum1avg = slice_text ( Data.hum1avg  , str(FullString) )
+    Data.temp5avg = slice_text ( Data.temp5avg  , str(FullString) )
+    Data.hum5avg = slice_text ( Data.hum5avg  , str(FullString) )
+    Data.co2ppm = slice_text ( Data.co2ppm  , str(FullString) )
+    Data.co2V = slice_text ( Data.co2V  , str(FullString) )
+
+    result = (str(date).strip()) + ";temp;" + str(Data.temp) + ";hum;" + str(Data.hum) + ";temp1avg;" + str(Data.temp1avg)
+    result +=  ";hum1avg;" + str(Data.hum1avg) + ";temp5avg;" + str(Data.temp5avg) + ";hum5avg;"
+    result +=  str(Data.hum5avg) + ";co2ppm;" + str(Data.co2ppm) + ";co2V;" + str(Data.co2V)
+   # print (result)
+   #writing in file (in www folder for graphics)
+    file = open ('/www/site/temp-service.txt',"a")
+    file.write( str(result) + '\n')
+    file.close()

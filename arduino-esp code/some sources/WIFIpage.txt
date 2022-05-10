@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <title>ESP 8266</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    button.socketoff {
+      color: green;
+      padding: 10px 27px;
+    }
+        button.socketon {
+      color: red;
+      padding: 10px 27px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1 style="text-align: center;font-family: Open sans;font-weight: 800;font-size: 24px;">ESP8266 Web Server</h1>
+  <div>
+
+    <h2 style="text-align: center;font-family: Open sans;font-weight: 600;font-size: 20px;">Temperature: &#176;C</h2>
+    <h2 style="text-align: center;font-family: Open sans;font-weight: 600;font-size: 20px;">Humidity: %</h2>
+    <h2 style="text-align: center;font-family: Open sans;font-weight: 600;font-size: 20px;">Average 1-min temperature: &#176;C</h2>
+    <h2 style="text-align: center;font-family: Open sans;font-weight: 600;font-size: 20px;">Average 1-min Humidity: %</h2>
+    <h2 style="text-align: center;font-family: Open sans;font-weight: 600;font-size: 20px;">Average 5-min temperature: &#176;C</h2>
+    <h2 style="text-align: center;font-family: Open sans;font-weight: 600;font-size: 20px;">Average 5-min Humidity: %</h2>
+    <h2 style="text-align: center;font-family: Open sans;font-weight: 600;font-size: 20px;">CO2 RAW Voltage: V</h2>
+    <h2 style="text-align: center;font-family: Open sans;font-weight: 600;font-size: 20px;">CO2 ppm: ppm</h2>
+    <h2 style="text-align: center;font-family: Open sans;font-weight: 600;font-size: 20px;">220V State: <span style="text-align: center;width: 98px;color:white ;padding: 10px 30px;background-color: #ec1212;margin: 0 auto;">OFF</span> <span style="text-align: center;width: 98px;color:white ;padding: 10px 30px;background-color: #12ec41;margin: 0 auto;">ON</span> </h2>
+
+    <p style="text-align: center;font-family: Open sans;font-weight: 100;font-size: 18px;">=============REFRESH=============</p>
+    <div style="text-align:center;margin-top: 20px;"><a href="/"><button style="width:158px;">REFRESH DATA</button></a></div>
+    <p style="text-align: center;font-family: Open sans;font-weight: 100;font-size: 18px;">=============REFRESH=============</p>
+
+    <p style="text-align: center;font-family: Open sans;font-weight: 100;font-size: 18px;">==========Socket control============</p>
+
+    <div style="text-align: center; width: 98px; color: white; padding: 10px 30px; background-color: #ec1212; margin: 0 auto;">OFF</div>
+    <div style="text-align: center; width: 98px; color: white; padding: 10px 30px; background-color: #12ec41; margin: 0 auto;">ON</div>
+    
+    <div style="text-align: center; margin: 5px 0px;"> <a href="socket1On"><button class="socketoff">ON</button></a>&nbsp;<a href="socket1Off"><button class="socketon">OFF</button></a></div>
+
+    <p style="text-align: center;font-family: Open sans;font-weight: 100;font-size: 18px;">==========Socket control============</p>
+    ... testdfdfdd
+    \" - это экранирование двойных кавычек для кода дуины, не забыть, добавить при
+    создании кода
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title></title>
+  <!--<link rel="stylesheet" href="style.css" />-->
+</head>
+<body>
+
+<canvas id="myChart" width="400px" height="400px"></canvas>
+<script src="http://127.0.0.1/script/chart.js"></script>
+
+<script>
+if ( ! (window.File && window.FileReader && window.FileList && window.Blob)) {
+  alert('The File APIs are not fully supported in this browser.');
+}
+</script>
+ 
+<script>
+function X_Axis (file) { <!--//Date and time line-->
+var arr = Array.from(file);
+for (let i = 0; i < arr.length-1; i++) 
+  {
+    arr[i] = arr[i][0] + " " +arr[i][1];
+  }
+  arr.pop();
+  return arr
+}
+
+function Y_Axis (file) { <!--//Temp 5 min avg-->
+  var arr = Array.from(file);
+  for (let i = 0; i < arr.length-1; i++) 
+  {
+    arr[i] = arr[i][11];
+  }
+  arr.pop();
+  return arr
+}
+
+function Y1_Axis (file) { <!--//Hum 5 min avg-->
+  var arr = Array.from(file);
+  for (let i = 0; i < arr.length-1; i++) 
+  {
+    arr[i] = arr[i][13];
+  }
+  return arr
+  arr.pop();
+}
+
+function Y2_Axis (file) { <!--//CO2 ppm-->
+  var arr = Array.from(file);
+  for (let i = 0; i < arr.length-1; i++) 
+  {
+    arr[i] = arr[i][15];
+  }
+  return arr
+  arr.pop();
+}
+
+function String_Slice (allText) {
+var textToArray = allText.split("\n").map(function(x){return x.split(";")});
+return textToArray
+}
+
+function Download_File(file_path) 
+{
+    var allText = [];
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file_path, false);
+    rawFile.onreadystatechange = function (){
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+              allText = rawFile.responseText;
+              window.allText = String_Slice(allText);
+              
+            }
+        }
+    }
+   
+    rawFile.send(null);
+    <!--// return allText-->
+    <!--//alert('problem with file'); //придумать обработку и посмотреть state-->
+}
+
+<!--//file = readTextFile('temp-service.txt')-->
+
+Download_File('temp-service.txt');
+const file = window.allText;
+<!--//x_axis = X_Axis (file);-->
+  <!--//console.log(x_axis);-->
+    <!--//y_axis = Y_Axis (file);-->
+      <!--//console.log(y_axis);-->
+        <!--//y1_axis = Y1_Axis (file);-->
+          <!--//console.log(y1_axis);-->
+            <!--//y2_axis = Y2_Axis (file);-->
+              <!--//console.log(y2_axis);-->
+<!--//alert(allText1);-->
+
+</script>
+
+<script>
+const ctx = document.getElementById('myChart');
+const myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: X_Axis (file),
+        datasets: [{
+            label: 'Temperature C',
+            data: Y_Axis (file),
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+            ],
+            borderWidth: 3,
+            yAxisID: 'y1',
+                  },
+                   {
+            label: 'Humidity %',
+            data: Y1_Axis (file),
+            backgroundColor: [
+                'rgba(120, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(125, 99, 132, 1)',
+            ],
+            borderWidth: 3,
+            yAxisID: 'y1',
+                  },
+                  {
+            label: 'CO2 ppm',
+            data: Y2_Axis (file),
+            backgroundColor: [
+                'rgba(185, 231, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(185, 231, 132, 1)',
+            ],
+            borderWidth: 3,
+            yAxisID: 'y3',
+                  },
+                                     ]
+    },
+    options: {
+      responsive: true,
+      interaction: {
+      mode: 'index',
+      intersect: false,
+                    },
+      stacked: false,
+      plugins: {
+      title: {
+        display: true,
+        text: 'My web graphs temp'
+               }
+             },
+        scales: {
+            y1: {
+                type:'linear',
+                display: true,
+                 position: 'left',
+                beginAtZero: false,
+            },
+            y3: {
+                type:'linear',
+                display: true,
+                position: 'right',
+                beginAtZero: false,
+            },          
+        }
+    }
+});
+</script>
+
+</body>
+</html>
