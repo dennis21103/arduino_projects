@@ -6,9 +6,27 @@
   <!--<link rel="stylesheet" href="style.css" />-->
 </head>
 <body>
+ <div align="center">My web graphs temp:
+  <select name="selector" id="selector" onChange="ReDraw(this.value)">
+    <option value="1" >5 min</option>
+    <option value="3" selected>15 min</option>
+    <option value="6">30 min</option>
+    <option value="12">1 hour</option>
+    <option value="24">2 hours</option>
+    <option value="48">4 hours</option>
+    <option value="96">8 hours</option>
+    <option value="144">12 hours</option>
+    <option value="288">1 day</option>
+  </select>
+ </div> 
+<div id = "canva" ><canvas id="myChart" width="400px" height="400px"></canvas></div> 
+<script src="http://127.0.0.1/chart.js"></script>
 
-<canvas id="myChart" width="400px" height="400px"></canvas>
-<script src="http://127.0.0.1/script/chart.js"></script>
+<script>
+var select = document.getElementById("selector");
+var time_line = Number(select.value);
+</script>
+
 
 <script>
 if ( ! (window.File && window.FileReader && window.FileList && window.Blob)) {
@@ -17,44 +35,61 @@ if ( ! (window.File && window.FileReader && window.FileList && window.Blob)) {
 </script>
  
 <script>
-function X_Axis (file) { <!--//Date and time line-->
+function everyNth_element(arr,time_line) {
+  const result = [];
+  for (let i=0; i<arr.length-1; i+=time_line) {
+    result[i] = arr[i]; 
+  }
+
+  return result;
+}  
+function X_Axis (file, time_line) { <!--//Date and time line-->
 var arr = Array.from(file);
 for (let i = 0; i < arr.length-1; i++) 
   {
     arr[i] = arr[i][0] + " " +arr[i][1];
   }
   arr.pop();
+  arr = everyNth_element(arr,time_line);
+  
   return arr
 }
 
-function Y_Axis (file) { <!--//Temp 5 min avg-->
+function Y_Axis (file, time_line) { <!--//Temp 5 min avg-->
   var arr = Array.from(file);
   for (let i = 0; i < arr.length-1; i++) 
   {
     arr[i] = arr[i][11];
   }
   arr.pop();
+  arr = everyNth_element(arr,time_line);
+
   return arr
 }
 
-function Y1_Axis (file) { <!--//Hum 5 min avg-->
+function Y1_Axis (file, time_line) { <!--//Hum 5 min avg-->
   var arr = Array.from(file);
   for (let i = 0; i < arr.length-1; i++) 
   {
     arr[i] = arr[i][13];
   }
-  return arr
   arr.pop();
-}
+  arr = everyNth_element(arr,time_line);
 
-function Y2_Axis (file) { <!--//CO2 ppm-->
+  return arr
+ }
+
+function Y2_Axis (file, time_line) { <!--//CO2 ppm-->
   var arr = Array.from(file);
   for (let i = 0; i < arr.length-1; i++) 
   {
     arr[i] = arr[i][15];
   }
-  return arr
   arr.pop();
+  arr = everyNth_element(arr,time_line);
+
+  return arr
+
 }
 
 function String_Slice (allText) {
@@ -84,31 +119,21 @@ function Download_File(file_path)
     <!--//alert('problem with file'); //придумать обработку и посмотреть state-->
 }
 
-<!--//file = readTextFile('temp-service.txt')-->
-
 Download_File('temp-service.txt');
 const file = window.allText;
-<!--//x_axis = X_Axis (file);-->
-  <!--//console.log(x_axis);-->
-    <!--//y_axis = Y_Axis (file);-->
-      <!--//console.log(y_axis);-->
-        <!--//y1_axis = Y1_Axis (file);-->
-          <!--//console.log(y1_axis);-->
-            <!--//y2_axis = Y2_Axis (file);-->
-              <!--//console.log(y2_axis);-->
-<!--//alert(allText1);-->
 
 </script>
 
 <script>
+function Draw (time_line){
 const ctx = document.getElementById('myChart');
 const myChart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: X_Axis (file),
+        labels: X_Axis (file, time_line),
         datasets: [{
             label: 'Temperature C',
-            data: Y_Axis (file),
+            data: Y_Axis (file, time_line),
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
             ],
@@ -120,7 +145,7 @@ const myChart = new Chart(ctx, {
                   },
                    {
             label: 'Humidity %',
-            data: Y1_Axis (file),
+            data: Y1_Axis (file, time_line),
             backgroundColor: [
                 'rgba(120, 99, 132, 0.2)',
             ],
@@ -132,7 +157,7 @@ const myChart = new Chart(ctx, {
                   },
                   {
             label: 'CO2 ppm',
-            data: Y2_Axis (file),
+            data: Y2_Axis (file, time_line),
             backgroundColor: [
                 'rgba(185, 231, 132, 0.2)',
             ],
@@ -154,7 +179,7 @@ const myChart = new Chart(ctx, {
       plugins: {
       title: {
         display: true,
-        text: 'My web graphs temp'
+        text: ''
                }
              },
         scales: {
@@ -173,6 +198,13 @@ const myChart = new Chart(ctx, {
         }
     }
 });
+}
+function ReDraw(time_line){
+  document.querySelector("#canva").innerHTML = '<canvas id="myChart" width="400px" height="400px"></canvas>';
+  time_line = Number(time_line);
+  Draw(time_line);
+}
+Draw(time_line);
 </script>
 
 </body>
