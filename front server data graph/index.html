@@ -7,8 +7,7 @@
 </head>
 <body>
  <div align="center">My web graphs temp:
-  <select name="selector" id="selector" onChange="ReDraw(this.value)">
-    <option value="1" >5 min</option>
+  <select name="selector" id="selector" onChange="ReDraw(this.value, document.getElementById('selector2').value)">
     <option value="3" selected>15 min</option>
     <option value="6">30 min</option>
     <option value="12">1 hour</option>
@@ -18,6 +17,16 @@
     <option value="144">12 hours</option>
     <option value="288">1 day</option>
   </select>
+  in:
+  <select name="selector2" id="selector2" onChange="ReDraw( document.getElementById('selector').value, this.value)">
+    <option value="0" >all</option>
+    <option value="288" >1</option>
+    <option value="576" selected>2</option>
+    <option value="1152">4</option>
+    <option value="2016">7</option>
+    <option value="4032">14</option>
+  </select>
+  days
  </div> 
 <div id = "canva" ><canvas id="myChart" width="400px" height="400px"></canvas></div> 
 <script src="http://127.0.0.1/chart.js"></script>
@@ -25,6 +34,8 @@
 <script>
 var select = document.getElementById("selector");
 var time_line = Number(select.value);
+var select2 = document.getElementById("selector2");
+var massive_length = Number(select2.value);
 </script>
 
 
@@ -40,56 +51,55 @@ function everyNth_element(arr,time_line) {
   for (let i=0; i<arr.length-1; i+=time_line) {
     result[i] = arr[i]; 
   }
-
   return result;
-}  
-function X_Axis (file, time_line) { <!--//Date and time line-->
-var arr = Array.from(file);
-for (let i = 0; i < arr.length-1; i++) 
-  {
-    arr[i] = arr[i][0] + " " +arr[i][1];
-  }
-  arr.pop();
-  arr = everyNth_element(arr,time_line);
-  
-  return arr
 }
 
-function Y_Axis (file, time_line) { <!--//Temp 5 min avg-->
+function axis_shrink (file, time_line, massive_length, axis){
   var arr = Array.from(file);
-  for (let i = 0; i < arr.length-1; i++) 
-  {
-    arr[i] = arr[i][11];
+  switch (axis) {
+  case 'x' :    <!--//Date and time line
+              for (let i = 0; i < arr.length-1; i++) 
+              {
+                  arr[i] = arr[i][0] + " " +arr[i][1]; 
+              }
+            break;
+  case 'y' :    <!--//Temp 5 min avg-->
+               for (let i = 0; i < arr.length-1; i++) 
+              {
+                  arr[i] = arr[i][11];
+              }
+    break;
+  case 'y1' :   <!--//Hum 5 min avg-->
+              for (let i = 0; i < arr.length-1; i++) 
+              {
+                  arr[i] = arr[i][13];
+              }
+    break;
+  case 'y2' :   <!--//Hum 5 min avg-->
+              for (let i = 0; i < arr.length-1; i++) 
+              {
+                  arr[i] = arr[i][15];
+              }
+    break;
+  default:
+    alert('Error in axis parameters');
+    break;
+} 
+arr.pop();
+  if (Number(massive_length) > 0) {
+  var arr1 =[];
+  arr.reverse();
+  for (let i = 0; i < Number(massive_length); i++) 
+    {
+    arr1[i] = arr[i];
   }
-  arr.pop();
-  arr = everyNth_element(arr,time_line);
-
-  return arr
-}
-
-function Y1_Axis (file, time_line) { <!--//Hum 5 min avg-->
-  var arr = Array.from(file);
-  for (let i = 0; i < arr.length-1; i++) 
-  {
-    arr[i] = arr[i][13];
+  arr1.reverse();
+  arr = everyNth_element(arr1,time_line);
+                                  }
+  else {
+    arr = everyNth_element(arr,time_line);
   }
-  arr.pop();
-  arr = everyNth_element(arr,time_line);
-
   return arr
- }
-
-function Y2_Axis (file, time_line) { <!--//CO2 ppm-->
-  var arr = Array.from(file);
-  for (let i = 0; i < arr.length-1; i++) 
-  {
-    arr[i] = arr[i][15];
-  }
-  arr.pop();
-  arr = everyNth_element(arr,time_line);
-
-  return arr
-
 }
 
 function String_Slice (allText) {
@@ -113,7 +123,6 @@ function Download_File(file_path)
             }
         }
     }
-   
     rawFile.send(null);
     <!--// return allText-->
     <!--//alert('problem with file'); //придумать обработку и посмотреть state-->
@@ -125,15 +134,15 @@ const file = window.allText;
 </script>
 
 <script>
-function Draw (time_line){
+function Draw (time_line, massive_length){
 const ctx = document.getElementById('myChart');
 const myChart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: X_Axis (file, time_line),
+        labels: axis_shrink (file, time_line, massive_length,'x'),
         datasets: [{
             label: 'Temperature C',
-            data: Y_Axis (file, time_line),
+            data: axis_shrink (file, time_line, massive_length,'y'),
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
             ],
@@ -145,7 +154,7 @@ const myChart = new Chart(ctx, {
                   },
                    {
             label: 'Humidity %',
-            data: Y1_Axis (file, time_line),
+            data: axis_shrink (file, time_line, massive_length,'y1'),
             backgroundColor: [
                 'rgba(120, 99, 132, 0.2)',
             ],
@@ -157,7 +166,7 @@ const myChart = new Chart(ctx, {
                   },
                   {
             label: 'CO2 ppm',
-            data: Y2_Axis (file, time_line),
+            data: axis_shrink (file, time_line, massive_length,'y2'),
             backgroundColor: [
                 'rgba(185, 231, 132, 0.2)',
             ],
@@ -199,12 +208,13 @@ const myChart = new Chart(ctx, {
     }
 });
 }
-function ReDraw(time_line){
+function ReDraw(time_line, massive_length){
   document.querySelector("#canva").innerHTML = '<canvas id="myChart" width="400px" height="400px"></canvas>';
   time_line = Number(time_line);
-  Draw(time_line);
+  massive_length = Number(massive_length);
+  Draw(time_line, massive_length);
 }
-Draw(time_line);
+Draw(time_line, massive_length);
 </script>
 
 </body>
